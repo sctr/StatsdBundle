@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class M6WebStatsdExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -66,7 +66,7 @@ class M6WebStatsdExtension extends Extension
             $container->setDefinition('m6.data_collector.statsd', $definition);
         }
 
-        // Listner of console events
+        // Listener of console events
         if ($config['console_events']) {
             $container
                 ->register(
@@ -102,7 +102,7 @@ class M6WebStatsdExtension extends Extension
      *
      * @throws InvalidConfigurationException
      */
-    protected function loadClient($container, $alias, array $config, array $servers, $baseEvents)
+    protected function loadClient($container, $alias, array $config, array $servers, $baseEvents): string
     {
         $usedServers = [];
         $events = $config['events'];
