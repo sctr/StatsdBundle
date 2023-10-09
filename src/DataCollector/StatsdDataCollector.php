@@ -88,7 +88,7 @@ class StatsdDataCollector extends DataCollector
      * @param Response   $response  The response object
      * @param \Throwable $exception An exception
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
     }
 
@@ -97,7 +97,7 @@ class StatsdDataCollector extends DataCollector
      *
      * @return array operations list
      */
-    public function getClients()
+    public function getClients(): array
     {
         return $this->data['clients'];
     }
@@ -107,7 +107,7 @@ class StatsdDataCollector extends DataCollector
      *
      * @return int the number of operations
      */
-    public function getOperations()
+    public function getOperations(): int
     {
         return $this->data['operations'];
     }
