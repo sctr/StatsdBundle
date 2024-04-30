@@ -29,10 +29,8 @@ class StatsdEvent extends GenericEvent implements MonitorableEventInterface
 
     /**
      * array of tags [key => value]
-     *
-     * @return array
      */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->hasArgument('tags') ? $this->getArgument('tags') : [];
     }

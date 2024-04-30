@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace M6Web\Bundle\StatsdBundle\DataCollector;
 
+use M6Web\Bundle\StatsdBundle\Client\Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\HttpKernel\Event\KernelEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Handle datacollector for statsd
  */
 class StatsdDataCollector extends DataCollector
 {
-    private $statsdClients;
+    private array $statsdClients = [];
 
     /**
      * Construct the data collector
@@ -38,14 +37,9 @@ class StatsdDataCollector extends DataCollector
         ];
     }
 
-    /**
-     * Kernel event
-     *
-     * @param Event $event The received event
-     */
-    public function onKernelResponse($event): void
+    public function onKernelResponse(ResponseEvent $event): void
     {
-        if ($event instanceof KernelEvent && HttpKernelInterface::MASTER_REQUEST == $event->getRequestType()) {
+        if ($event->isMainRequest()) {
             foreach ($this->statsdClients as $clientName => $client) {
                 $clientInfo = [
                     'name' => $clientName,
@@ -71,12 +65,12 @@ class StatsdDataCollector extends DataCollector
     }
 
     /**
-     * Add a statsd client to monitor
+     * Add a statsd client to monitor.
      *
      * @param string $clientAlias  The client alias
-     * @param object $statsdClient A statsd client instance
+     * @param Client $statsdClient A statsd client instance
      */
-    public function addStatsdClient($clientAlias, $statsdClient): void
+    public function addStatsdClient(string $clientAlias, Client $statsdClient): void
     {
         $this->statsdClients[$clientAlias] = $statsdClient;
     }
@@ -95,7 +89,7 @@ class StatsdDataCollector extends DataCollector
     /**
      * Return the list of statsd operations
      *
-     * @return array operations list
+     * @return Client[] operations list
      */
     public function getClients(): array
     {

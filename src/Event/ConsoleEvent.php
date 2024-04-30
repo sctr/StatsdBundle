@@ -17,36 +17,11 @@ abstract class ConsoleEvent extends Event
     public const ERROR = 'm6web.console.error';
     public const EXCEPTION = 'm6web.console.exception';
 
-    /**
-     * Original triggered console event
-     *
-     * @var BaseConsoleEvent
-     */
-    protected $originalEvent;
-
-    /**
-     * Command start time
-     *
-     * @var float
-     */
-    protected $startTime;
-
-    /**
-     * Command execution time
-     *
-     * @var float
-     */
-    protected $executionTime;
-
-    /**
-     * @param float $startTime
-     * @param float $executionTime
-     */
-    final public function __construct(BaseConsoleEvent $originalEvent, $startTime = null, $executionTime = null)
-    {
-        $this->originalEvent = $originalEvent;
-        $this->startTime = $startTime;
-        $this->executionTime = $executionTime;
+    final public function __construct(
+        protected BaseConsoleEvent $originalEvent,
+        protected ?float  $startTime,
+        protected ?float $executionTime
+    ) {
     }
 
     /**
@@ -65,20 +40,16 @@ abstract class ConsoleEvent extends Event
 
     /**
      * Get command start time
-     *
-     * @return float
      */
-    public function getStartTime()
+    public function getStartTime(): float
     {
         return $this->startTime;
     }
 
     /**
-     * Get command execution time
-     *
-     * @return float Time ellapsed since command start (ms)
+     * Get command execution time in ms
      */
-    public function getExecutionTime()
+    public function getExecutionTime(): float
     {
         return $this->executionTime * 1000;
     }
@@ -86,41 +57,31 @@ abstract class ConsoleEvent extends Event
     /**
      * Alias of getExecutionTime
      * Allows timer simple usage
-     *
-     * @return float
      */
-    public function getTiming()
+    public function getTiming(): float
     {
         return $this->getExecutionTime();
     }
 
     /**
      * Get peak memory usage
-     *
-     * @return int
      */
-    public function getPeakMemory()
+    public function getPeakMemory(): int
     {
         $memory = memory_get_peak_usage(true);
-        $memory = ($memory > 1024 ? intval($memory / 1024) : 0);
 
-        return $memory;
+        return ($memory > 1024 ? intval($memory / 1024) : 0);
     }
 
-    /**
-     * @return BaseConsoleEvent
-     */
-    public function getOriginalEvent()
+    public function getOriginalEvent(): BaseConsoleEvent
     {
         return $this->originalEvent;
     }
 
     /**
      * Get an underscored command name, if available
-     *
-     * @return string|null
      */
-    public function getUnderscoredCommandName()
+    public function getUnderscoredCommandName(): ?string
     {
         $command = $this->getOriginalEvent()->getCommand();
 
@@ -134,14 +95,9 @@ abstract class ConsoleEvent extends Event
     /**
      * Create new event object
      *
-     * @param float $startTime
-     * @param float $executionTime
-     *
-     * @return ConsoleEvent
-     *
      * @throws \InvalidArgumentException
      */
-    public static function createFromConsoleEvent(BaseConsoleEvent $e, $startTime = null, $executionTime = null)
+    public static function createFromConsoleEvent(BaseConsoleEvent $e, float $startTime = null, float $executionTime = null): static
     {
         if (static::support($e)) {
             return new static($e, $startTime, $executionTime);
@@ -152,10 +108,8 @@ abstract class ConsoleEvent extends Event
 
     /**
      * Check if given event is supported by current class
-     *
-     * @return bool
      */
-    protected static function support(BaseConsoleEvent $e)
+    protected static function support(BaseConsoleEvent $e): bool
     {
         return true;
     }

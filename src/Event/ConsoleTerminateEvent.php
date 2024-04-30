@@ -12,7 +12,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent as BaseEvent;
  */
 class ConsoleTerminateEvent extends ConsoleEvent
 {
-    protected static function support(BaseConsoleEvent $e)
+    protected static function support(BaseConsoleEvent $e): bool
     {
         return $e instanceof BaseEvent;
     }

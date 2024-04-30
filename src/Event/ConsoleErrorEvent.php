@@ -12,7 +12,7 @@ use Symfony\Component\Console\Event\ConsoleEvent as BaseConsoleEvent;
  */
 class ConsoleErrorEvent extends ConsoleEvent
 {
-    protected static function support(BaseConsoleEvent $e)
+    protected static function support(BaseConsoleEvent $e): bool
     {
         return $e instanceof BaseEvent;
     }

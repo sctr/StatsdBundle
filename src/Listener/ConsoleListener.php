@@ -15,15 +15,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ConsoleListener
 {
-    /** @var ?EventDispatcherInterface */
-    protected $eventDispatcher;
+    protected ?EventDispatcherInterface $eventDispatcher = null;
 
     /**
      * Time when command started
-     *
-     * @var ?float
      */
-    protected $startTime;
+    protected ?float $startTime = null;
 
     public function __construct()
     {
@@ -34,19 +31,19 @@ class ConsoleListener
     /**
      * Define event dispatch
      */
-    public function setEventDispatcher(EventDispatcherInterface $ev)
+    public function setEventDispatcher(EventDispatcherInterface $ev): void
     {
         $this->eventDispatcher = $ev;
     }
 
-    public function onCommand(BaseConsoleEvent $e)
+    public function onCommand(BaseConsoleEvent $e): void
     {
         $this->startTime = microtime(true);
 
         $this->dispatch($e, ConsoleEvent::COMMAND);
     }
 
-    public function onTerminate(ConsoleTerminateEvent $e)
+    public function onTerminate(ConsoleTerminateEvent $e): void
     {
         // For non-0 exit command, fire an ERROR event
         if ($e->getExitCode() != 0) {
@@ -56,21 +53,18 @@ class ConsoleListener
         $this->dispatch($e, ConsoleEvent::TERMINATE);
     }
 
-    public function onException(BaseConsoleEvent $e)
+    public function onException(BaseConsoleEvent $e): void
     {
         $this->dispatch($e, ConsoleEvent::EXCEPTION);
     }
 
     /**
      * Dispatch custom event
-     *
-     * @param string $eventName
-     *
-     * @return bool|object
      */
-    protected function dispatch(BaseConsoleEvent $e, $eventName)
+    protected function dispatch(BaseConsoleEvent $e, string $eventName): bool|object
     {
         if (null !== $this->eventDispatcher) {
+            /** @var ConsoleEvent $class */
             $class = str_replace(
                 'Symfony\Component\Console\Event',
                 'M6Web\Bundle\StatsdBundle\Event',

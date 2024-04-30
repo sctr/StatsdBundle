@@ -14,21 +14,16 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class Client extends BaseClient
 {
-    /** @var array */
-    protected $listenedEvents = [];
+    protected array $listenedEvents = [];
 
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
+    protected ?PropertyAccessorInterface $propertyAccessor = null;
 
-    /** @var int|null */
-    protected $toSendLimit;
+    protected ?int $toSendLimit;
 
     /**
      * getter for listenedEvents
-     *
-     * @return array
      */
-    public function getListenedEvents()
+    public function getListenedEvents(): array
     {
         return $this->listenedEvents;
     }
@@ -39,19 +34,15 @@ class Client extends BaseClient
      * @param string $eventName   The event name to listen
      * @param array  $eventConfig The event handler configuration
      */
-    public function addEventToListen($eventName, $eventConfig)
+    public function addEventToListen(string $eventName, array $eventConfig): void
     {
         $this->listenedEvents[$eventName] = $eventConfig;
     }
 
     /**
      * Set toSend limit
-     *
-     * @param int $toSendLimit
-     *
-     * @return $this
      */
-    public function setToSendLimit($toSendLimit)
+    public function setToSendLimit(int $toSendLimit): self
     {
         $this->toSendLimit = $toSendLimit;
 
@@ -60,10 +51,8 @@ class Client extends BaseClient
 
     /**
      * set the property accessor used in replaceConfigPlaceholder
-     *
-     * @return $this
      */
-    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor): self
     {
         $this->propertyAccessor = $propertyAccessor;
 
@@ -73,14 +62,9 @@ class Client extends BaseClient
     /**
      * Handle an event
      *
-     * @param Event  $event an event
-     * @param string $name  the event name
-     *
-     * @return void
-     *
      * @throws Exception
      */
-    public function handleEvent($event, $name = null)
+    public function handleEvent(Event $event, ?string $name = null): void
     {
         if (!isset($this->listenedEvents[$name])) {
             return;
@@ -135,12 +119,9 @@ class Client extends BaseClient
     /**
      * getEventValue
      *
-     * @param Event  $event
-     * @param string $method
-     *
      * @throws Exception
      */
-    private function getEventValue($event, $method)
+    private function getEventValue(Event $event, string $method): mixed
     {
         if (!method_exists($event, $method)) {
             throw new Exception('The event class '.get_class($event).' must have a '.$method.' method in order to mesure value');
@@ -153,14 +134,14 @@ class Client extends BaseClient
      * Factorisation of the timing method
      * find the value timed
      *
-     * @param object $event        Event
+     * @param Event $event        Event
      * @param string $timingMethod Callable method in the event
      * @param string $node         Node
      * @param array  $tags         Tags key => value for influxDb
      *
      * @throws Exception
      */
-    private function addTiming($event, $timingMethod, $node, $tags = [])
+    private function addTiming(Event $event, string $timingMethod, string $node, array $tags = []): void
     {
         $timing = $this->getEventValue($event, $timingMethod);
         if ($timing > 0) {
@@ -174,15 +155,13 @@ class Client extends BaseClient
      * @param Event  $event     An event
      * @param string $eventName The name of the event
      * @param string $string    The node in which the replacing will happen
-     *
-     * @return string
      */
-    private function replaceConfigPlaceholder($event, $eventName, $string)
+    private function replaceConfigPlaceholder(Event $event, string $eventName, string $string): string
     {
         // `event->getName()` is deprecated, we have to replace <name> directly with $eventName
         $string = str_replace('<name>', $eventName, $string);
 
-        if ((preg_match_all('/<([^>]*)>/', $string, $matches) > 0) and ($this->propertyAccessor !== null)) {
+        if ((preg_match_all('/<([^>]*)>/', $string, $matches) > 0) && ($this->propertyAccessor !== null)) {
             $tokens = $matches[1];
             foreach ($tokens as $token) {
                 $value = (string) $this->propertyAccessor->getValue($event, $token);
@@ -195,14 +174,10 @@ class Client extends BaseClient
 
     /**
      * Merge config tags with tags manually sent with the event
-     *
-     * @param array $config
-     *
-     * @return array of tags
      */
-    private function mergeTags($event, $config)
+    private function mergeTags(Event $event, array $config): array
     {
-        $configTags = isset($config['tags']) ? $config['tags'] : [];
+        $configTags = $config['tags'] ?? [];
 
         if ($event instanceof MonitorableEventInterface) {
             return array_merge($configTags, $event->getTags());
