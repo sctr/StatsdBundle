@@ -97,7 +97,7 @@ abstract class ConsoleEvent extends Event
      *
      * @throws \InvalidArgumentException
      */
-    public static function createFromConsoleEvent(BaseConsoleEvent $e, float $startTime = null, float $executionTime = null): static
+    public static function createFromConsoleEvent(BaseConsoleEvent $e, ?float $startTime = null, ?float $executionTime = null): static
     {
         if (static::support($e)) {
             return new static($e, $startTime, $executionTime);

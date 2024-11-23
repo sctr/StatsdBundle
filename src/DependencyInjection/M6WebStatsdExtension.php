@@ -23,8 +23,8 @@ class M6WebStatsdExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $servers = isset($config['servers']) ? $config['servers'] : [];
-        $clients = isset($config['clients']) ? $config['clients'] : [];
+        $servers = $config['servers'] ?? [];
+        $clients = $config['clients'] ?? [];
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');

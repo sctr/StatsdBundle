@@ -82,7 +82,7 @@ class StatsdDataCollector extends DataCollector
      * @param Response   $response  The response object
      * @param \Throwable $exception An exception
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
     }
 
